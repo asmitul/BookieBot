@@ -1,0 +1,11 @@
+{
+    "telegram": {
+        "developer_id": 6052271063
+    },
+    "logging": {
+        "level": "DEBUG"
+    },
+    "app": {
+        "name": "BookieBot"
+    }
+}
