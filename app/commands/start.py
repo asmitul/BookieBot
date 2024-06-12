@@ -103,7 +103,7 @@ async def to_account(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     datetime_now = datetime.datetime.now()
     amount = convert_to_number(amount)
     rate = convert_to_number(rate)
-    amount_Low = round(amount / rate, 2)
+    amount_Low = round(amount * rate, 2)
 
     transaction = {
         "serialNumber": 0,
@@ -128,7 +128,7 @@ async def to_account(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     new_account_data = {
         'name': out_money_account['name'],
         'currency': out_money_account['currency'],
-        'balance': out_money_account['balance'] - amount_Low,
+        'balance': out_money_account['balance'] - amount,
         'create_date': out_money_account['create_date'],
         'last_update_date': datetime_now.isoformat()
     }
@@ -142,7 +142,7 @@ async def to_account(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     new_account_data = {
         'name': in_money_account['name'],
         'currency': in_money_account['currency'],
-        'balance': in_money_account['balance'] + amount,
+        'balance': in_money_account['balance'] + amount_Low,
         'create_date': in_money_account['create_date'],
         'last_update_date': datetime_now.isoformat()
     }
