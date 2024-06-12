@@ -73,7 +73,7 @@ async def balance(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     account_id = query.data.split("_")[2]
 
     r = get_account_by_id(account_id=account_id)
-    r = escape_markdown(text=r['name'], version=2) + " : " +"`" + str(round(r['balance'], 2)) + "`" + " " + r['currency']
+    r = escape_markdown(text=r['name'], version=2) + " : " +"`" + str(round(r['balance'], 6)) + "`" + " " + r['currency']
     await query.edit_message_text(r, parse_mode="MarkdownV2")
     
     return ConversationHandler.END
