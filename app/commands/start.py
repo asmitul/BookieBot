@@ -16,29 +16,24 @@ from functions.str_to_number import convert_to_number
 FROM_ACCOUNT, AMOUNT, RATE, TO_ACCOUNT = range(4)
 
 def all_accounts(prefix):
-    print("all_accounts start")
     """Send all accounts to the user with a specified prefix for callback_data."""
     accounts = get_all_account().get('accounts')
-    print(f"all_accounts: {accounts}")
+
     if accounts:
         buttons = [InlineKeyboardButton(f"{acc['name']} ({acc['currency']})", callback_data=f"{prefix}_{acc['id']}") for acc in accounts]
     else:
         buttons = []
-    print("all_accounts end")
     return buttons
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    print("start start")
     """Sends a message with inline buttons attached, with pagination."""
     
     await send_buttons(update.message.chat_id, context, prefix="from_acc")
 
-    print("start end")
     return FROM_ACCOUNT
 
 
 async def send_buttons(chat_id, context: ContextTypes.DEFAULT_TYPE, prefix, update_message=None, page=0) -> int:
-    print(f" prefix: {prefix}")
     """Helper function to send or update buttons with pagination."""
     buttons = all_accounts(prefix)
     start_index = page * BUTTONS_PER_PAGE
@@ -58,7 +53,6 @@ async def send_buttons(chat_id, context: ContextTypes.DEFAULT_TYPE, prefix, upda
 
     reply_markup = InlineKeyboardMarkup(keyboard)
     
-    print(f"update_message 111111111111 :{update_message}")
     if update_message:
         await update_message.edit_reply_markup(reply_markup)
     else:
@@ -72,7 +66,6 @@ async def send_buttons(chat_id, context: ContextTypes.DEFAULT_TYPE, prefix, upda
 
 
 async def from_account(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    print("from_account start")
     """Stores the chosen from account and asks for the amount."""
     query = update.callback_query
     await query.answer()
@@ -81,14 +74,12 @@ async def from_account(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
     return AMOUNT
 
 async def amount(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    print("amount start")
     """Stores the amount and asks for the exchange rate."""
     context.user_data['amount'] = update.message.text
     await update.message.reply_text("Please enter the exchange rate:")
     return RATE
 
 async def rate(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    print("rate start")
     """Stores the exchange rate and asks the user to choose the to account."""
     context.user_data['rate'] = update.message.text
     await update.message.reply_text("Please choose the account to transfer to:")
@@ -96,7 +87,6 @@ async def rate(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     return TO_ACCOUNT
 
 async def to_account(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    print("to_account start")
     """Stores the chosen to account and ends the conversation."""
     query = update.callback_query
     await query.answer()
@@ -127,11 +117,40 @@ async def to_account(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         "last_update_date": datetime_now.isoformat(),
     }
 
-    r = create_transaction(transaction)
+    create_transaction(transaction)
 
     # Perform the transaction or any other operation
-    await query.edit_message_text(r)
+    # await query.edit_message_text(r)
 
+    # - money
+    out_money_account = get_account_by_id(from_account)
+
+    new_account_data = {
+        'name': out_money_account['name'],
+        'currency': out_money_account['currency'],
+        'balance': out_money_account['balance'] - amount_Low,
+        'create_date': out_money_account['create_date'],
+        'last_update_date': datetime_now.isoformat()
+    }
+
+    update_account(account_id=from_account, account_data=new_account_data)
+
+
+    # + money
+    in_money_account = get_account_by_id(to_account)
+
+    new_account_data = {
+        'name': in_money_account['name'],
+        'currency': in_money_account['currency'],
+        'balance': in_money_account['balance'] + amount,
+        'create_date': in_money_account['create_date'],
+        'last_update_date': datetime_now.isoformat()
+    }
+
+    update_account(account_id=to_account, account_data=new_account_data)
+
+
+    await query.edit_message_text("Transaction completed successfully!")
 
 
     return ConversationHandler.END
@@ -139,7 +158,6 @@ async def to_account(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    print("cancel start")
     """Cancels and ends the conversation."""
     await update.message.reply_text('Operation cancelled.')
     return ConversationHandler.END
@@ -173,7 +191,6 @@ async def next_page2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
     current_page = int(query.data.split("_")[3])
     prefix = query.data.split("_")[1] + "_" + query.data.split("_")[2] 
-    print(f"next page prefix: {prefix}")
     await send_buttons(query.message.chat_id, context, prefix=prefix, update_message = query.message ,page=current_page + 1)
 
     return TO_ACCOUNT
