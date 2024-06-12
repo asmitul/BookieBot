@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ConversationHandler, MessageHandler, filters
 
-from commands.start import start, from_account, amount, rate, to_account, cancel, next_page, prev_page,next_page2, prev_page2,FROM_ACCOUNT, AMOUNT, RATE, TO_ACCOUNT
+from commands.start import start, from_account, amount, amount_low, to_account, cancel, next_page, prev_page,next_page2, prev_page2,FROM_ACCOUNT, AMOUNT, AMOUNT_LOW, TO_ACCOUNT
 from commands.create import create, account_name, currency, cancel_create,ACCOUNT_NAME, CURRENCY
 from commands.balance import balance_start, balance, ACCOUNT_BALANCE, cancel_balance
 from configs.telegram import TOKEN
@@ -20,7 +20,7 @@ def main() -> None:
         states={
             FROM_ACCOUNT: [CallbackQueryHandler(from_account, pattern=r"^from_acc_.+$"),CallbackQueryHandler(next_page, pattern=r'^next_from_acc_\d+$'),CallbackQueryHandler(prev_page, pattern=r'^prev_from_acc_\d+$')],
             AMOUNT: [MessageHandler(filters.TEXT & ~filters.COMMAND, amount)],
-            RATE: [MessageHandler(filters.TEXT & ~filters.COMMAND, rate)],
+            AMOUNT_LOW: [MessageHandler(filters.TEXT & ~filters.COMMAND, amount_low)],
             TO_ACCOUNT: [CallbackQueryHandler(to_account, pattern=r"^to_acc_.+$"),CallbackQueryHandler(next_page2, pattern=r'^next_to_acc_\d+$'),CallbackQueryHandler(prev_page2, pattern=r'^prev_to_acc_\d+$')],
         },
         fallbacks=[CommandHandler('cancel', cancel)],

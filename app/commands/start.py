@@ -13,7 +13,7 @@ from configs.app import BUTTONS_PER_PAGE
 from functions.str_to_number import convert_to_number
 
 # Define states for ConversationHandler
-FROM_ACCOUNT, AMOUNT, RATE, TO_ACCOUNT = range(4)
+FROM_ACCOUNT, AMOUNT, AMOUNT_LOW, TO_ACCOUNT = range(4)
 
 def all_accounts(prefix):
     """Send all accounts to the user with a specified prefix for callback_data."""
@@ -74,14 +74,12 @@ async def from_account(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
     return AMOUNT
 
 async def amount(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Stores the amount and asks for the exchange rate."""
     context.user_data['amount'] = update.message.text
-    await update.message.reply_text("Please enter the exchange rate:")
-    return RATE
+    await update.message.reply_text("Please enter the transfer in amount:")
+    return AMOUNT_LOW
 
-async def rate(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Stores the exchange rate and asks the user to choose the to account."""
-    context.user_data['rate'] = update.message.text
+async def amount_low(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    context.user_data['amount_low'] = update.message.text
     await update.message.reply_text("Please choose the account to transfer to:")
     await send_buttons(update.message.chat_id, context, prefix="to_acc")
     return TO_ACCOUNT
@@ -95,22 +93,22 @@ async def to_account(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     from_account = context.user_data['from_account']
     to_account = context.user_data['to_account']
     amount = context.user_data['amount']
-    rate = context.user_data['rate']
+    amount_low = context.user_data['amount_low']
     
     
 
     # add transaction
     datetime_now = datetime.datetime.now()
     amount = convert_to_number(amount)
-    rate = convert_to_number(rate)
-    amount_Low = round(amount * rate, 2)
+    amount_low = convert_to_number(amount_low)
+    rate = round(amount_low / amount, 6)
 
     transaction = {
         "serialNumber": 0,
         "account_id_High": from_account,
         "amount_High": amount,
         "rate": rate,
-        "amount_Low": amount_Low,
+        "amount_Low": amount_low,
         "account_id_Low": to_account,
         "description": None,
         "create_date": datetime_now.isoformat(),
@@ -142,7 +140,7 @@ async def to_account(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     new_account_data = {
         'name': in_money_account['name'],
         'currency': in_money_account['currency'],
-        'balance': in_money_account['balance'] + amount_Low,
+        'balance': in_money_account['balance'] + amount_low,
         'create_date': in_money_account['create_date'],
         'last_update_date': datetime_now.isoformat()
     }
