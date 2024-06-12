@@ -126,7 +126,7 @@ async def to_account(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     new_account_data = {
         'name': out_money_account['name'],
         'currency': out_money_account['currency'],
-        'balance': out_money_account['balance'] - amount,
+        'balance': round(out_money_account['balance'] - amount, 6),
         'create_date': out_money_account['create_date'],
         'last_update_date': datetime_now.isoformat()
     }
@@ -140,7 +140,7 @@ async def to_account(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     new_account_data = {
         'name': in_money_account['name'],
         'currency': in_money_account['currency'],
-        'balance': in_money_account['balance'] + amount_low,
+        'balance': round(in_money_account['balance'] + amount_low, 6),
         'create_date': in_money_account['create_date'],
         'last_update_date': datetime_now.isoformat()
     }
