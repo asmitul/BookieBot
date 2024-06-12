@@ -21,7 +21,9 @@ def all_accounts(prefix):
     accounts = get_all_account().get('accounts')
 
     if accounts:
-        buttons = [InlineKeyboardButton(f"{acc['name']} ({acc['currency']})", callback_data=f"{prefix}_{acc['id']}") for acc in accounts]
+        # 按照 "last_update_date" 重新排列账户列表，最新的在前
+        sorted_accounts = sorted(accounts, key=lambda x: x['last_update_date'], reverse=True)
+        buttons = [InlineKeyboardButton(f"{acc['name']} ({acc['currency']})", callback_data=f"{prefix}_{acc['id']}") for acc in sorted_accounts]
     else:
         buttons = []
     return buttons
