@@ -1,3 +1,4 @@
+import datetime
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes, ConversationHandler
 
@@ -9,6 +10,7 @@ from API import get_all_account, get_account_by_id, update_account, delete_accou
 
 # Constants for pagination
 from configs.app import BUTTONS_PER_PAGE
+from functions.str_to_number import convert_to_number
 
 # Define states for ConversationHandler
 FROM_ACCOUNT, AMOUNT, RATE, TO_ACCOUNT = range(4)
@@ -105,10 +107,33 @@ async def to_account(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     amount = context.user_data['amount']
     rate = context.user_data['rate']
     
+    
+
+    # add transaction
+    datetime_now = datetime.datetime.now()
+    amount = convert_to_number(amount)
+    rate = convert_to_number(rate)
+    amount_Low = round(amount / rate, 2)
+
+    transaction = {
+        "serialNumber": 0,
+        "account_id_High": from_account,
+        "amount_High": amount,
+        "rate": rate,
+        "amount_Low": amount_Low,
+        "account_id_Low": to_account,
+        "description": None,
+        "create_date": datetime_now.isoformat(),
+        "last_update_date": datetime_now.isoformat(),
+    }
+
+    r = create_transaction(transaction)
+
     # Perform the transaction or any other operation
-    await query.edit_message_text(
-        text=f"Transfer from account {from_account} to account {to_account} with amount {amount} and rate {rate}."
-    )
+    await query.edit_message_text(r)
+
+
+
     return ConversationHandler.END
 
 
