@@ -5,6 +5,7 @@ from commands.start import start, from_account, amount, rate, to_account, cancel
 from commands.create import create, account_name, currency, cancel_create,ACCOUNT_NAME, CURRENCY
 from configs.telegram import TOKEN
 from error.handler import handler as error_handler
+from commands.texts import texts as text_handler
 
 def main() -> None:
     """Start the bot."""
@@ -37,6 +38,8 @@ def main() -> None:
     )
 
     application.add_handler(create_conversation_handler)
+
+    application.add_handler(MessageHandler(filters.TEXT, text_handler))
 
     
     application.run_polling(allowed_updates=Update.ALL_TYPES)
