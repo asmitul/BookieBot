@@ -3,7 +3,7 @@ from telegram.ext import Application, CommandHandler, CallbackQueryHandler, Conv
 
 from commands.start import start, from_account, amount, amount_low, to_account, cancel, next_page, prev_page,next_page2, prev_page2,FROM_ACCOUNT, AMOUNT, AMOUNT_LOW, TO_ACCOUNT
 from commands.create import create, account_name, currency, cancel_create,ACCOUNT_NAME, CURRENCY
-from commands.balance import balance_start, balance, ACCOUNT_BALANCE, cancel_balance
+from commands.balance import balance_start, balance, ACCOUNT_BALANCE, cancel_balance, next_page3, prev_page3
 from configs.telegram import TOKEN
 from error.handler import handler as error_handler
 from commands.texts import texts as text_handler
@@ -44,7 +44,7 @@ def main() -> None:
     get_balance_conversation_handler = ConversationHandler(
         entry_points=[CommandHandler('balance', balance_start)],
         states={
-            ACCOUNT_BALANCE: [CallbackQueryHandler(balance, pattern=r"^acc_balance_.+$")],
+            ACCOUNT_BALANCE: [CallbackQueryHandler(balance, pattern=r"^acc_balance_.+$"),CallbackQueryHandler(next_page3, pattern=r'^next_acc_balance_\d+$'),CallbackQueryHandler(prev_page3, pattern=r'^prev_acc_balance_\d+$')],
         },
         fallbacks=[CommandHandler('cancel_balance', cancel_balance)],
     )

@@ -87,7 +87,7 @@ async def cancel_balance(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     await update.message.reply_text('Operation cancelled.')
     return ConversationHandler.END
 
-async def next_page(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def next_page3(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Callback function for 'Next' button."""
     query = update.callback_query
     await query.answer()
@@ -98,7 +98,7 @@ async def next_page(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
     return ACCOUNT_BALANCE
 
-async def prev_page(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def prev_page3(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Callback function for 'Previous' button."""
     query = update.callback_query
     await query.answer()
