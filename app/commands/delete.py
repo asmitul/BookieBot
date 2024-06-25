@@ -20,7 +20,7 @@ def all_transactions(prefix):
 
     if transactions:
         sorted_transactions = sorted(transactions, key=lambda x: x['last_update_date'], reverse=True)
-        buttons = [InlineKeyboardButton(f"{transaction['amount_High']} -> {transaction['amount_Low']} ({transaction['serialNumber']})", callback_data=f"{prefix}_{transaction['serialNumber']}") for transaction in sorted_transactions]
+        buttons = [InlineKeyboardButton(f"{transaction['amount_High']} 💲{transaction['rate']} {transaction['amount_Low']} ({transaction['serialNumber']})", callback_data=f"{prefix}_{transaction['serialNumber']}") for transaction in sorted_transactions]
     else:
         buttons = []
     return buttons
