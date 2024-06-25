@@ -4,6 +4,7 @@ from telegram.ext import Application, CommandHandler, CallbackQueryHandler, Conv
 from commands.start import start, from_account, amount, amount_low, to_account, cancel, next_page, prev_page,next_page2, prev_page2,FROM_ACCOUNT, AMOUNT, AMOUNT_LOW, TO_ACCOUNT
 from commands.create import create, account_name, currency, cancel_create,ACCOUNT_NAME, CURRENCY
 from commands.balance import balance_start, balance, ACCOUNT_BALANCE, cancel_balance, next_page3, prev_page3
+from commands.delete import delete_start, select_account, cancel_delete, next_page as next_page4, prev_page as prev_page4, SELECT_ACCOUNT
 from configs.telegram import TOKEN
 from error.handler import handler as error_handler
 from commands.texts import texts as text_handler
@@ -50,6 +51,18 @@ def main() -> None:
     )
 
     application.add_handler(get_balance_conversation_handler)
+
+    # delete transaction
+    delete_transaction_conversation_handler = ConversationHandler(
+        entry_points=[CommandHandler('delete', delete_start)],
+        states={
+            SELECT_ACCOUNT: [CallbackQueryHandler(select_account, pattern=r"^transaction_.+$"),CallbackQueryHandler(next_page4, pattern=r'^next_transaction_\d+$'),CallbackQueryHandler(prev_page4, pattern=r'^prev_transaction_\d+$')],
+        },
+        fallbacks=[CommandHandler('cancel_delete', cancel_delete)],
+    )
+
+    application.add_handler(delete_transaction_conversation_handler)
+
 
     application.add_handler(MessageHandler(filters.TEXT, text_handler))
 
