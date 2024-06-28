@@ -2,12 +2,13 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ConversationHandler, MessageHandler, filters
 
 from commands.start import start, from_account, amount, amount_low, to_account, cancel, next_page, prev_page,next_page2, prev_page2,FROM_ACCOUNT, AMOUNT, AMOUNT_LOW, TO_ACCOUNT
-from commands.create import create, account_name, currency, cancel_create,ACCOUNT_NAME, CURRENCY
+from commands.create import create, account_name, currency, cancel_create, type, ACCOUNT_NAME, CURRENCY, TYPE
 from commands.balance import balance_start, balance, ACCOUNT_BALANCE, cancel_balance, next_page3, prev_page3
 from commands.delete import delete_start, select_account, cancel_delete, next_page as next_page4, prev_page as prev_page4, SELECT_ACCOUNT
 from configs.telegram import TOKEN
 from error.handler import handler as error_handler
 from commands.texts import texts as text_handler
+from commands.report import report, callback_liquid, callback_illiquid, callback_income, callback_expense
 
 def main() -> None:
     """Start the bot."""
@@ -34,6 +35,7 @@ def main() -> None:
         entry_points=[CommandHandler('create', create)],
         states={
             ACCOUNT_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, account_name)],
+            TYPE: [MessageHandler(filters.TEXT & ~filters.COMMAND, type)],
             CURRENCY: [MessageHandler(filters.TEXT & ~filters.COMMAND, currency)],
         },
         fallbacks=[CommandHandler('cancel_create', cancel_create)],
@@ -62,6 +64,14 @@ def main() -> None:
     )
 
     application.add_handler(delete_transaction_conversation_handler)
+
+    # report
+
+    application.add_handler(CommandHandler("report", report))
+    application.add_handler(CallbackQueryHandler(callback_liquid, pattern=r"^liquid$"))
+    application.add_handler(CallbackQueryHandler(callback_illiquid, pattern=r"^illiquid$"))
+    application.add_handler(CallbackQueryHandler(callback_income, pattern=r"^income$"))
+    application.add_handler(CallbackQueryHandler(callback_expense, pattern=r"^expense$"))
 
 
     application.add_handler(MessageHandler(filters.TEXT, text_handler))

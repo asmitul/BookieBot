@@ -80,6 +80,7 @@ async def select_account(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 'name': out_money_account['name'],
                 'currency': out_money_account['currency'],
                 'balance': round(out_money_account['balance'] - transaction['amount_Low'], 6),
+                'type': out_money_account['type'],
                 'create_date': out_money_account['create_date'],
                 'last_update_date': datetime_now.isoformat()
             }
@@ -94,6 +95,7 @@ async def select_account(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 'name': in_money_account['name'],
                 'currency': in_money_account['currency'],
                 'balance': round(in_money_account['balance'] + transaction['amount_High'], 6),
+                'type': in_money_account['type'],
                 'create_date': in_money_account['create_date'],
                 'last_update_date': datetime_now.isoformat()
             }
