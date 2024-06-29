@@ -10,7 +10,6 @@ from API import get_all_account, get_account_by_id, update_account, delete_accou
 
 # Constants for pagination
 from configs.app import BUTTONS_PER_PAGE
-from functions.str_to_number import convert_to_number
 
 SELECT_ACCOUNT = range(1)
 
@@ -18,12 +17,21 @@ def all_transactions(prefix):
     """Send all transactions to the user with a specified prefix for callback_data."""
     transactions = get_all_transactions().get('transactions')
 
+    accounts = get_all_account().get('accounts')
+    print(accounts)
+    
+
     if transactions:
         sorted_transactions = sorted(transactions, key=lambda x: x['last_update_date'], reverse=True)
-        buttons = [InlineKeyboardButton(f"{transaction['amount_High']} 💲{transaction['rate']} {transaction['amount_Low']} ({transaction['serialNumber']})", callback_data=f"{prefix}_{transaction['serialNumber']}") for transaction in sorted_transactions]
+        buttons = [InlineKeyboardButton(f"{transaction['amount_High']} {get_account_name(accounts, transaction['account_id_High'])} --> {transaction['amount_Low']} {get_account_name(accounts, transaction['account_id_Low'])}", callback_data=f"{prefix}_{transaction['serialNumber']}") for transaction in sorted_transactions]
     else:
         buttons = []
     return buttons
+
+def get_account_name(accounts, account_id):
+    for account in accounts:
+        if account['id'] == account_id:
+            return account['name']
 
 async def delete_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     
@@ -39,7 +47,8 @@ async def send_buttons(chat_id, context: ContextTypes.DEFAULT_TYPE, prefix, upda
     end_index = min(len(buttons), (page + 1) * BUTTONS_PER_PAGE)
 
     keyboard = [
-        buttons[i:i + 2] for i in range(start_index, end_index, 2)
+        # buttons[i:i + 2] for i in range(start_index, end_index, 2)
+        [buttons[i]] for i in range(start_index, end_index)
     ]
     
     pagination_buttons = []
