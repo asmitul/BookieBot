@@ -72,16 +72,22 @@ async def from_account(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
     query = update.callback_query
     await query.answer()
     context.user_data['from_account'] = query.data.split("_")[2]
-    await query.edit_message_text(text="Please enter the amount to transfer:")
+    await query.edit_message_text(text="🔴⬆️Please enter the amount to transfer:")
     return AMOUNT
 
 async def amount(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     context.user_data['amount'] = update.message.text
-    await update.message.reply_text("Please enter the transfer in amount:")
+    await update.message.reply_text("🟢⬇️Please enter the transfer in amount: \nif same amount /amount_low_is_same_to_high")
     return AMOUNT_LOW
 
 async def amount_low(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     context.user_data['amount_low'] = update.message.text
+    await update.message.reply_text("Please choose the account to transfer to:")
+    await send_buttons(update.message.chat_id, context, prefix="to_acc")
+    return TO_ACCOUNT
+
+async def amount_low_is_same_to_high(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    context.user_data['amount_low'] = context.user_data['amount']
     await update.message.reply_text("Please choose the account to transfer to:")
     await send_buttons(update.message.chat_id, context, prefix="to_acc")
     return TO_ACCOUNT
@@ -151,8 +157,14 @@ async def to_account(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
     update_account(account_id=to_account, account_data=new_account_data)
 
+    text_out = f"🔴⬆️ {out_money_account['name']}({out_money_account['currency']}): {amount}"
+    if rate == 1:
+        text_rate = ""
+    else:
+        text_rate = f"        {out_money_account['currency']}{in_money_account['currency']} rate : {rate}"  + "\n"
+    text_in = f"🟢⬇️ {in_money_account['name']}({in_money_account['currency']}): {amount_low}"
 
-    await query.edit_message_text("Transaction completed successfully!")
+    await query.edit_message_text(f"{text_out}\n{text_rate}{text_in}")
 
 
     return ConversationHandler.END
