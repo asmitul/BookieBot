@@ -21,6 +21,9 @@ def buttons():
         [
             InlineKeyboardButton("Liquid", callback_data="liquid"),
             InlineKeyboardButton("Illiquid", callback_data="illiquid")
+        ],
+        [
+            InlineKeyboardButton("Vadeli", callback_data="vadeli")
         ]
     ]
 
@@ -253,3 +256,27 @@ async def callback_this_month(update: Update, context: ContextTypes.DEFAULT_TYPE
     # for loop . send every message 
     for account_id_low, data in sorted_data.items():
         await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{data['name']} : {data['cost']}")
+
+
+async def callback_vadeli(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    accounts = get_all_account()
+    accounts = accounts.get('accounts')
+
+    # Get current time
+    current_time = datetime.now()
+
+    # Get first and last day of last month
+    yesterday = current_time - timedelta(days=1)
+
+
+    for account in accounts:
+        iso_time_str = account['create_date']
+        parsed_time = datetime.fromisoformat(iso_time_str)
+
+        if yesterday <= parsed_time :
+            # YYYY-MM-DD
+            date_str = parsed_time.strftime("%Y-%m-%d")
+            name = account['name'] + " - " + account['currency']
+            balance = account['balance']
+
+            await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{date_str} \n{name} : {balance}")
