@@ -17,7 +17,7 @@ async def create(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 async def account_name(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     account_name = update.message.text
     context.user_data['account_name'] = account_name
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Please enter the type of the account , \n0 for income \n1 for Liquid assets like cash / bank account \n11 for Illiquid assets, \n2 for expense, \n3 for vadeli account:")
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Please enter the type of the account , \n0 for income \n1 for Liquid assets like cash / bank account \n11 for Illiquid assets, \n2 for expense, \n3 for vadeli account, \n4 for FON account: ")
     return TYPE
 
 async def type(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:

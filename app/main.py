@@ -8,7 +8,7 @@ from commands.delete import delete_start, select_account, cancel_delete, next_pa
 from configs.telegram import TOKEN
 from error.handler import handler as error_handler
 from commands.texts import texts as text_handler
-from commands.report import report, callback_liquid, callback_illiquid, callback_income, callback_expense, callback_last_month, callback_this_month, callback_vadeli
+from commands.report import report, callback_liquid, callback_illiquid, callback_income, callback_expense, callback_last_month, callback_this_month, callback_vadeli, callback_fon
 
 def main() -> None:
     """Start the bot."""
@@ -76,7 +76,7 @@ def main() -> None:
     application.add_handler(CallbackQueryHandler(callback_last_month, pattern=r"^last_month$"))
     application.add_handler(CallbackQueryHandler(callback_this_month, pattern=r"^this_month$"))
     application.add_handler(CallbackQueryHandler(callback_vadeli, pattern=r"^vadeli$"))
-
+    application.add_handler(CallbackQueryHandler(callback_fon, pattern=r"^fon$"))
 
 
     application.add_handler(MessageHandler(filters.TEXT, text_handler))

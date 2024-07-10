@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes, ConversationHandler
+from API import get_fon_current_price
 
 # logger
 from logger import setup_logger
@@ -23,7 +24,8 @@ def buttons():
             InlineKeyboardButton("Illiquid", callback_data="illiquid")
         ],
         [
-            InlineKeyboardButton("Vadeli", callback_data="vadeli")
+            InlineKeyboardButton("Fon", callback_data="fon"),
+            InlineKeyboardButton("Vadeli", callback_data="vadeli"),
         ]
     ]
 
@@ -280,3 +282,88 @@ async def callback_vadeli(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             balance = account['balance']
 
             await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{date_str} \n{name} : {balance}")
+
+async def callback_fon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    accounts = get_all_account()
+    accounts = accounts.get('accounts')
+
+    transactions = get_all_transactions()
+    transactions = transactions.get('transactions')
+
+    # resort transactions by serialNumber high to low
+    transactions.sort(key=lambda x: x['serialNumber'], reverse=True)
+
+    fon = []
+
+    for account in accounts:
+        if account['type'] == 4:
+            if account['balance'] > 0:
+                account_id = account['id']
+                amount = account['balance']                
+
+                for transaction in transactions:
+                    data = {}
+                    if transaction['account_id_Low'] == account_id:
+                        if amount <= 0 :
+                            break
+                        else:
+                            diff = amount - transaction['amount_Low']
+
+                            if diff <= 0:
+                                data['serialNumber'] = transaction['serialNumber']
+                                data['account_id'] = account['id']
+                                data['name'] = account['name']
+                                data['price'] = transaction['amount_High'] / transaction['amount_Low']
+                                data['amount'] = amount
+
+                                fon.append(data)
+                                amount = 0
+
+                            else:
+                                data['serialNumber'] = transaction['serialNumber']
+                                data['account_id'] = account['id']
+                                data['name'] = account['name']
+                                data['price'] = transaction['amount_High'] / transaction['amount_Low']
+                                data['amount'] = transaction['amount_Low']
+
+                                fon.append(data)
+                                amount = amount - transaction['amount_Low']
+    
+    # print(f"fon : {fon}")
+    # [{'serialNumber': 126, 'account_id': '668cf37656b883407f082f1b', 'name': "IHK İŞ'TE KADIN", 'rate': 13.1, 'amount': 10.0}, {'serialNumber': 123, 'account_id': '668cf37656b883407f082f1b', 'name': "IHK İŞ'TE KADIN", 'rate': 13.0, 'amount': 30.0}, {'serialNumber': 127, 'account_id': '668e423343426f64b88634d3', 'name': 'TEE fon', 'rate': 20.0, 'amount': 10.0}]            
+            
+    for data in fon:
+        # get name and rate
+        name = data['name']
+        price = data['price']
+        amount = data['amount']
+        
+        fon_code = name.split()[0]
+        current_price = get_fon_current_price(fon_code)
+        # replace , to .
+        current_price = current_price.replace(",", ".")
+        # convert to float or int
+        current_price = convert_to_num(current_price)
+
+        diff = round((current_price - price) * amount, 6)
+
+        if diff > 0:
+            text = f"🟢{name}  `{amount}` \* \(`{price}` \- `{current_price}`\) Kar\: `{diff}` TL"
+        else:
+            text = f"🔴{name}  `{amount}` \* \(`{price}` \- `{current_price}`\) Zarar\: `{diff}` TL"
+
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode="MarkdownV2")
+            
+            
+        
+def convert_to_num(s: str):
+    try:
+        # Try converting to an integer
+        return int(s)
+    except ValueError:
+        try:
+            # If it fails, try converting to a float
+            return float(s)
+        except ValueError:
+            # If both conversions fail, return None or raise an error
+            return None

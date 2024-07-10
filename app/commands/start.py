@@ -161,7 +161,7 @@ async def to_account(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     if rate == 1:
         text_rate = ""
     else:
-        text_rate = f"        {out_money_account['currency']}{in_money_account['currency']} rate : {rate}"  + "\n"
+        text_rate = f"        {out_money_account['currency']}{in_money_account['currency']} rate : {rate}"  + "\n" + f"        {in_money_account['currency']}{out_money_account['currency']} rate : {1/rate}"  + "\n"
     text_in = f"🟢⬇️ {in_money_account['name']}({in_money_account['currency']}): {amount_low}"
 
     await query.edit_message_text(f"{text_out}\n{text_rate}{text_in}")
