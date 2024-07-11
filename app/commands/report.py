@@ -316,9 +316,14 @@ async def callback_last_week(update: Update, context: ContextTypes.DEFAULT_TYPE)
     # sort by cost
     sorted_data = dict(sorted(last_week_account_cost.items(), key=lambda item: item[1]['cost'], reverse=True))
 
-    # for loop . send every message 
+    # for loop . send every message
+    first_day_of_last_week = first_day_of_last_week.strftime("%Y-%m-%d %H:%M")
+    last_day_of_last_week = last_day_of_last_week.strftime("%Y-%m-%d %H:%M")
+
+    text = f"{first_day_of_last_week} <-> {last_day_of_last_week} \n\n"
     for account_id_low, data in sorted_data.items():
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{data['name']} : {data['cost']}")
+        text += f"{data['name']} : {data['cost']}\n"
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 async def callback_this_week(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # Fetch all transactions
@@ -370,8 +375,14 @@ async def callback_this_week(update: Update, context: ContextTypes.DEFAULT_TYPE)
     sorted_data = dict(sorted(last_week_account_cost.items(), key=lambda item: item[1]['cost'], reverse=True))
 
     # for loop . send every message 
+    # convert current_time to YYYY-MM-DD
+    current_time = current_time.strftime("%Y-%m-%d %H:%M")
+    first_day_of_current_week = first_day_of_current_week.strftime("%Y-%m-%d %H:%M")
+    text = f"{first_day_of_current_week} <-> {current_time} \n\n"
     for account_id_low, data in sorted_data.items():
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{data['name']} : {data['cost']}")
+        text += f"{data['name']} : {data['cost']} \n"
+        
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 
 
