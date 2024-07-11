@@ -159,7 +159,7 @@ def get_fon_current_price(fon_code: str):
     }
     
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()  # Raises HTTPError if the response status is 4xx, 5xx
         
         soup = BeautifulSoup(response.text, 'html.parser')

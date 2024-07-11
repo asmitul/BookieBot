@@ -348,7 +348,7 @@ async def callback_fon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         # convert to float or int
         current_price = convert_to_num(current_price)
 
-        diff = round((current_price - price) * amount, 6)
+        diff = round((current_price - price) * amount, 2)
 
         if diff > 0:
             text = f"🟢{name}  `{amount}` \* \(`{price}` \- `{current_price}`\) Kar\: `{diff}` TL"
