@@ -1,4 +1,6 @@
 from datetime import datetime, timedelta, timezone
+import html
+from telegram.constants import ParseMode
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes, ConversationHandler
 from API import get_fon_current_price
@@ -477,11 +479,11 @@ async def callback_fon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         diff = round((current_price - price) * amount, 2)
 
         if diff > 0:
-            text = f"🟢{name}  `{amount}` \* \(`{price}` \- `{current_price}`\) Kar\: `{diff}` TL"
+            text = f"<pre language='python'>{html.escape(str(fon_code))} = {html.escape(str(amount))} * ({html.escape(str(current_price))} - {html.escape(str(price))}) # 🟢{html.escape(str(diff))} TL</pre>"
         else:
-            text = f"🔴{name}  `{amount}` \* \(`{price}` \- `{current_price}`\) Zarar\: `{diff}` TL"
+            text = f"<pre language='python'>{html.escape(str(fon_code))} = {html.escape(str(amount))} * ({html.escape(str(current_price))} - {html.escape(str(price))}) # 🔴{html.escape(str(diff))} TL</pre>"
 
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode="MarkdownV2")
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode=ParseMode.HTML)
             
             
         
