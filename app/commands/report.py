@@ -20,6 +20,10 @@ def buttons():
             InlineKeyboardButton("This Month", callback_data="this_month")
         ],
         [
+            InlineKeyboardButton("Last Week", callback_data="last_week"),
+            InlineKeyboardButton("This Week", callback_data="this_week")
+        ],
+        [
             InlineKeyboardButton("Liquid", callback_data="liquid"),
             InlineKeyboardButton("Illiquid", callback_data="illiquid")
         ],
@@ -258,6 +262,117 @@ async def callback_this_month(update: Update, context: ContextTypes.DEFAULT_TYPE
     # for loop . send every message 
     for account_id_low, data in sorted_data.items():
         await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{data['name']} : {data['cost']}")
+
+
+async def callback_last_week(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # Fetch all transactions
+    transactions = get_all_transactions()
+    transactions = transactions.get('transactions')
+
+    # List to store transactions from last week
+    serialNumber_last_week = []
+
+    # Dictionary to store the sum of amount_Low for each account_id_Low
+    account_low_sums = {}
+
+    # Get current time
+    current_time = datetime.now()
+
+    # Get first and last day of last week
+    first_day_of_current_week = current_time - timedelta(days=current_time.weekday())
+    first_day_of_current_week = first_day_of_current_week.replace(hour=0, minute=0, second=0, microsecond=0)
+    last_day_of_last_week = first_day_of_current_week - timedelta(seconds=1)
+    first_day_of_last_week = first_day_of_current_week - timedelta(days=7)
+
+    for transaction in transactions:
+        iso_time_str = transaction['create_date']
+        parsed_time = datetime.fromisoformat(iso_time_str)
+
+        if first_day_of_last_week <= parsed_time <= last_day_of_last_week:
+            serialNumber_last_week.append(transaction['serialNumber'])
+            
+            account_id_low = transaction['account_id_Low']
+            amount_low = transaction['amount_Low']
+
+            if account_id_low in account_low_sums:
+                account_low_sums[account_id_low] += amount_low
+            else:
+                account_low_sums[account_id_low] = amount_low
+
+    # 
+    last_week_account_cost = {}
+    for account_id_low, amount_low in account_low_sums.items():
+        account = get_account_by_id(account_id_low)
+
+        if account.get("type") == 2:
+            data = {
+                "name": account.get("name"),
+                "currency": account.get("currency"),
+                "cost": round(amount_low, 6)
+            }
+
+            last_week_account_cost[account_id_low] = data
+
+    # sort by cost
+    sorted_data = dict(sorted(last_week_account_cost.items(), key=lambda item: item[1]['cost'], reverse=True))
+
+    # for loop . send every message 
+    for account_id_low, data in sorted_data.items():
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{data['name']} : {data['cost']}")
+
+async def callback_this_week(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # Fetch all transactions
+    transactions = get_all_transactions()
+    transactions = transactions.get('transactions')
+
+    # List to store transactions from last week
+    serialNumber_this_week = []
+
+    # Dictionary to store the sum of amount_Low for each account_id_Low
+    account_low_sums = {}
+
+    # Get current time
+    current_time = datetime.now()
+
+    # Get first day 00:00 of this week
+    first_day_of_current_week = current_time - timedelta(days=current_time.weekday())
+    first_day_of_current_week = first_day_of_current_week.replace(hour=0, minute=0, second=0, microsecond=0)    
+
+    for transaction in transactions:
+        iso_time_str = transaction['create_date']
+        parsed_time = datetime.fromisoformat(iso_time_str)
+
+        if first_day_of_current_week <= parsed_time:
+            serialNumber_this_week.append(transaction['serialNumber'])
+            
+            account_id_low = transaction['account_id_Low']
+            amount_low = transaction['amount_Low']
+
+            if account_id_low in account_low_sums:
+                account_low_sums[account_id_low] += amount_low
+            else:
+                account_low_sums[account_id_low] = amount_low
+    # 
+    last_week_account_cost = {}
+    for account_id_low, amount_low in account_low_sums.items():
+        account = get_account_by_id(account_id_low)
+
+        if account.get("type") == 2:
+            data = {
+                "name": account.get("name"),
+                "currency": account.get("currency"),
+                "cost": round(amount_low, 6)
+            }
+
+            last_week_account_cost[account_id_low] = data
+
+    # sort by cost
+    sorted_data = dict(sorted(last_week_account_cost.items(), key=lambda item: item[1]['cost'], reverse=True))
+
+    # for loop . send every message 
+    for account_id_low, data in sorted_data.items():
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{data['name']} : {data['cost']}")
+
 
 
 async def callback_vadeli(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
