@@ -335,13 +335,16 @@ async def callback_fon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     for data in fon:
         # get name and rate
         name = data['name']
-        price = data['price']
+        price = round(data['price'], 6)
         amount = data['amount']
         
         fon_code = name.split()[0]
         current_price = get_fon_current_price(fon_code)
         # replace , to .
-        current_price = current_price.replace(",", ".")
+        try:
+            current_price = current_price.replace(",", ".")
+        except:
+            pass
         # convert to float or int
         current_price = convert_to_num(current_price)
 
