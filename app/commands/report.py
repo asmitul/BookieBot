@@ -488,18 +488,20 @@ async def callback_fon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
         if diff > 0:
             text = f"""
-Code: *{fon_code}*  Day: `{escape_markdown(str(day_diff), 2)}`
-🟢 Kar: `{escape_markdown(str(diff), 2)}` TL
-Gunluk Diff%: `{escape_markdown(str(round((current_price/price - 1) / day_diff * 100, 2)), 2)}` % 
-Total Diff%: `{escape_markdown(str(round((current_price/price - 1) * 100, 2)), 2)}` %
+Code: *{fon_code}*  Day: *{escape_markdown(str(day_diff), 2)}*
+Lot: *{escape_markdown(str(amount), 2)}*
+🟢 Kar: *{escape_markdown(str(diff), 2)}* TL
+Gunluk Diff%: *{escape_markdown(str(round((current_price/price - 1) / day_diff * 100, 2)), 2)}* % 
+Total Diff%: *{escape_markdown(str(round((current_price/price - 1) * 100, 2)), 2)}* %
 """
             total_amount += diff
         else:
             text = f"""
-Code: {fon_code}  Day: *{escape_markdown(str(day_diff), 2)}*
-🔴 Zarar: {escape_markdown(str(diff), 2)} TL
-Gunluk Diff%: {escape_markdown(str(round((current_price/price - 1) / day_diff * 100, 2)), 2)} % 
-Total Diff%: {escape_markdown(str(round((current_price/price - 1) * 100, 2)), 2)} %
+Code: *{fon_code}*  Day: *{escape_markdown(str(day_diff), 2)}*
+Lot: *{escape_markdown(str(amount), 2)}*
+🔴 Zarar: *{escape_markdown(str(diff), 2)}* TL
+Gunluk Diff%: *{escape_markdown(str(round((current_price/price - 1) / day_diff * 100, 2)), 2)}* % 
+Total Diff%: *{escape_markdown(str(round((current_price/price - 1) * 100, 2)), 2)}* %
 """
             total_amount += diff
 
