@@ -443,6 +443,7 @@ async def callback_fon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
                                 data['name'] = account['name']
                                 data['price'] = transaction['amount_High'] / transaction['amount_Low']
                                 data['amount'] = amount
+                                data['date'] = transaction['create_date']
 
                                 fon.append(data)
                                 amount = 0
@@ -453,6 +454,7 @@ async def callback_fon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
                                 data['name'] = account['name']
                                 data['price'] = transaction['amount_High'] / transaction['amount_Low']
                                 data['amount'] = transaction['amount_Low']
+                                data['date'] = transaction['create_date']
 
                                 fon.append(data)
                                 amount = amount - transaction['amount_Low']
@@ -479,13 +481,19 @@ async def callback_fon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
         diff = round((current_price - price) * amount, 2)
 
-        
+        day_diff = datetime.now() - datetime.fromisoformat(data['date'])
+        day_diff = day_diff.days
+        day_diff = day_diff + 1
 
         if diff > 0:
-            text = f"<pre language='python'>{html.escape(str(fon_code))} = {html.escape(str(amount))} * ({html.escape(str(current_price))} - {html.escape(str(price))}) # 🟢{html.escape(str(diff))} TL</pre>"
+            text1 = f"<pre language='python'>{html.escape(str(fon_code))} = {html.escape(str(amount))} * ({html.escape(str(current_price))} - {html.escape(str(price))}) # 🟢{html.escape(str(diff))} TL</pre>\n\n"
+            text2 = f"<pre>day = {html.escape(str(day_diff))}</pre>"
+            text = text1 + text2
             total_amount += diff 
         else:
-            text = f"<pre language='python'>{html.escape(str(fon_code))} = {html.escape(str(amount))} * ({html.escape(str(current_price))} - {html.escape(str(price))}) # 🔴{html.escape(str(diff))} TL</pre>"
+            text1 = f"<pre language='python'>{html.escape(str(fon_code))} = {html.escape(str(amount))} * ({html.escape(str(current_price))} - {html.escape(str(price))}) # 🔴{html.escape(str(diff))} TL</pre>\n\n"
+            text2 = f"<pre>day = {html.escape(str(day_diff))}</pre>"
+            text = text1 + text2
             total_amount += diff
 
         await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode=ParseMode.HTML)
