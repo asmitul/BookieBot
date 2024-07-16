@@ -468,7 +468,7 @@ async def callback_fon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         # get name and rate
         name = data['name']
         price = round(data['price'], 6)
-        amount = data['amount']
+        amount = round(data['amount'],0)
         
         fon_code = name.split()[0]
         current_price = get_fon_current_price(fon_code)
