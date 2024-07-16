@@ -459,7 +459,8 @@ async def callback_fon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     
     # print(f"fon : {fon}")
     # [{'serialNumber': 126, 'account_id': '668cf37656b883407f082f1b', 'name': "IHK İŞ'TE KADIN", 'rate': 13.1, 'amount': 10.0}, {'serialNumber': 123, 'account_id': '668cf37656b883407f082f1b', 'name': "IHK İŞ'TE KADIN", 'rate': 13.0, 'amount': 30.0}, {'serialNumber': 127, 'account_id': '668e423343426f64b88634d3', 'name': 'TEE fon', 'rate': 20.0, 'amount': 10.0}]            
-            
+    total_amount = 0
+
     for data in fon:
         # get name and rate
         name = data['name']
@@ -478,14 +479,19 @@ async def callback_fon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
         diff = round((current_price - price) * amount, 2)
 
+        
+
         if diff > 0:
             text = f"<pre language='python'>{html.escape(str(fon_code))} = {html.escape(str(amount))} * ({html.escape(str(current_price))} - {html.escape(str(price))}) # 🟢{html.escape(str(diff))} TL</pre>"
+            total_amount += diff 
         else:
             text = f"<pre language='python'>{html.escape(str(fon_code))} = {html.escape(str(amount))} * ({html.escape(str(current_price))} - {html.escape(str(price))}) # 🔴{html.escape(str(diff))} TL</pre>"
+            total_amount += diff
 
         await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode=ParseMode.HTML)
-            
-            
+    
+    text2 = f"Total : {total_amount} TL"
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=text2)
         
 def convert_to_num(s: str):
     try:
