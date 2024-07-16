@@ -507,8 +507,8 @@ Total Diff%: *{escape_markdown(str(round((current_price/price - 1) * 100, 2)), 2
 
         await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode="MarkdownV2")
     
-    text2 = f"Total : {total_amount} TL"
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=text2)
+    text2 = f"Total : {escape_markdown(str(total_amount),2)} TL"
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=text2, parse_mode="MarkdownV2")
         
 def convert_to_num(s: str):
     try:
