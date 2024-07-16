@@ -492,7 +492,7 @@ async def callback_fon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
         if diff > 0:
             text = f"""
-Code: *{fon_code}*  Day: *{escape_markdown(str(day_diff), 2)}*
+Code: [{fon_code}](https://www.tefas.gov.tr/FonAnaliz.aspx?FonKod={fon_code}) Day: *{escape_markdown(str(day_diff), 2)}*
 Lot: *{escape_markdown(str(amount), 2)}*
 🟢 Kar: *{escape_markdown(str(diff), 2)}* TL
 Gunluk Diff%: *{escape_markdown(str(round((current_price/price - 1) / day_diff * 100, 2)), 2)}* % 
@@ -509,7 +509,7 @@ Total Diff%: *{escape_markdown(str(round((current_price/price - 1) * 100, 2)), 2
 """
             total_amount += diff
 
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode="MarkdownV2")
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode="MarkdownV2", disable_web_page_preview=True)
     
     text2 = f"Total : *{escape_markdown(str(total_amount),2)}* TL"
     await context.bot.send_message(chat_id=update.effective_chat.id, text=text2, parse_mode="MarkdownV2")
