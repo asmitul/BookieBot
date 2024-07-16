@@ -474,7 +474,7 @@ async def callback_fon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         amount = int(amount)
         
         fon_code = name.split()[0]
-        time.sleep(2)
+        time.sleep(5)
         current_price = get_fon_current_price(fon_code)
         # replace , to .
         try:
