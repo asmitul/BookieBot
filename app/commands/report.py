@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+import time
 import html
 from telegram.constants import ParseMode
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
@@ -473,6 +474,7 @@ async def callback_fon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         amount = int(amount)
         
         fon_code = name.split()[0]
+        time.sleep(1)
         current_price = get_fon_current_price(fon_code)
         # replace , to .
         try:
