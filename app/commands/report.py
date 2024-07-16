@@ -463,7 +463,9 @@ async def callback_fon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     
     # print(f"fon : {fon}")
     # [{'serialNumber': 126, 'account_id': '668cf37656b883407f082f1b', 'name': "IHK İŞ'TE KADIN", 'rate': 13.1, 'amount': 10.0}, {'serialNumber': 123, 'account_id': '668cf37656b883407f082f1b', 'name': "IHK İŞ'TE KADIN", 'rate': 13.0, 'amount': 30.0}, {'serialNumber': 127, 'account_id': '668e423343426f64b88634d3', 'name': 'TEE fon', 'rate': 20.0, 'amount': 10.0}]            
-    total_amount = 0
+    total_kar_amount = 0
+    brfore_amount = 0
+    after_amount = 0
 
     for data in fon:
         # get name and rate
@@ -472,6 +474,7 @@ async def callback_fon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         amount = data['amount']
         # conver amount to int
         amount = int(amount)
+        brfore_amount += ( amount * price )
         
         fon_code = name.split()[0]
         time.sleep(5)
@@ -483,6 +486,8 @@ async def callback_fon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             pass
         # convert to float or int
         current_price = convert_to_num(current_price)
+
+        after_amount += ( amount * current_price )
 
         diff = round((current_price - price) * amount, 2)
 
@@ -498,7 +503,7 @@ Lot: *{escape_markdown(str(amount), 2)}*
 Gunluk Diff%: *{escape_markdown(str(round((current_price/price - 1) / day_diff * 100, 2)), 2)}* % 
 Total Diff%: *{escape_markdown(str(round((current_price/price - 1) * 100, 2)), 2)}* %
 """
-            total_amount += diff
+            total_kar_amount += diff
         else:
             text = f"""
 Code: *{fon_code}*  Day: *{escape_markdown(str(day_diff), 2)}*
@@ -507,11 +512,14 @@ Lot: *{escape_markdown(str(amount), 2)}*
 Gunluk Diff%: *{escape_markdown(str(round((current_price/price - 1) / day_diff * 100, 2)), 2)}* % 
 Total Diff%: *{escape_markdown(str(round((current_price/price - 1) * 100, 2)), 2)}* %
 """
-            total_amount += diff
+            total_kar_amount += diff
 
         await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode="MarkdownV2", disable_web_page_preview=True)
     
-    text2 = f"Total : *{escape_markdown(str(total_amount),2)}* TL"
+    text2 = f"""
+Total : *{escape_markdown(str(total_kar_amount),2)}* TL
+Total Diff%: *{escape_markdown(str(round((after_amount / brfore_amount - 1) * 100,2)), 2)}* %
+"""
     await context.bot.send_message(chat_id=update.effective_chat.id, text=text2, parse_mode="MarkdownV2")
         
 def convert_to_num(s: str):
