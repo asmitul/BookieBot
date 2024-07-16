@@ -3,6 +3,7 @@ import html
 from telegram.constants import ParseMode
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes, ConversationHandler
+from telegram.helpers import escape_markdown
 from API import get_fon_current_price
 
 # logger
@@ -486,17 +487,23 @@ async def callback_fon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         day_diff = day_diff + 1
 
         if diff > 0:
-            text1 = f"<pre language='python'>{html.escape(str(fon_code))} = {html.escape(str(amount))} * ({html.escape(str(current_price))} - {html.escape(str(price))}) # 🟢{html.escape(str(diff))} TL</pre>\n\n"
-            text2 = f"<pre>day = {html.escape(str(day_diff))}</pre>"
-            text = text1 + text2
-            total_amount += diff 
+            text = f"""
+Code: *{fon_code}*  Day: `{escape_markdown(str(day_diff), 2)}`
+🟢 Kar: `{escape_markdown(str(diff), 2)}` TL
+Gunluk Diff%: `{escape_markdown(str(round((current_price/price - 1) / day_diff * 100, 2)), 2)}` % 
+Total Diff%: `{escape_markdown(str(round((current_price/price - 1) * 100, 2)), 2)}` %
+"""
+            total_amount += diff
         else:
-            text1 = f"<pre language='python'>{html.escape(str(fon_code))} = {html.escape(str(amount))} * ({html.escape(str(current_price))} - {html.escape(str(price))}) # 🔴{html.escape(str(diff))} TL</pre>\n\n"
-            text2 = f"<pre>day = {html.escape(str(day_diff))}</pre>"
-            text = text1 + text2
+            text = f"""
+Code: {fon_code}  Day: *{escape_markdown(str(day_diff), 2)}*
+🔴 Zarar: {escape_markdown(str(diff), 2)} TL
+Gunluk Diff%: {escape_markdown(str(round((current_price/price - 1) / day_diff * 100, 2)), 2)} % 
+Total Diff%: {escape_markdown(str(round((current_price/price - 1) * 100, 2)), 2)} %
+"""
             total_amount += diff
 
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode=ParseMode.HTML)
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode="MarkdownV2")
     
     text2 = f"Total : {total_amount} TL"
     await context.bot.send_message(chat_id=update.effective_chat.id, text=text2)
