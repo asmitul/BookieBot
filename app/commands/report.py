@@ -468,7 +468,9 @@ async def callback_fon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         # get name and rate
         name = data['name']
         price = round(data['price'], 6)
-        amount = round(data['amount'],0)
+        amount = data['amount']
+        # conver amount to int
+        amount = int(amount)
         
         fon_code = name.split()[0]
         current_price = get_fon_current_price(fon_code)
@@ -507,7 +509,7 @@ Total Diff%: *{escape_markdown(str(round((current_price/price - 1) * 100, 2)), 2
 
         await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode="MarkdownV2")
     
-    text2 = f"Total : {escape_markdown(str(total_amount),2)} TL"
+    text2 = f"Total : *{escape_markdown(str(total_amount),2)}* TL"
     await context.bot.send_message(chat_id=update.effective_chat.id, text=text2, parse_mode="MarkdownV2")
         
 def convert_to_num(s: str):
