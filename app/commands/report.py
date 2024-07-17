@@ -491,9 +491,12 @@ async def callback_fon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
         diff = round((current_price - price) * amount, 2)
 
-        day_diff = datetime.now() - datetime.fromisoformat(data['date'])
+        data_date_str = data['date']
+        data_date = datetime.fromisoformat(data_date_str)
+        data_date_midnight = data_date.replace(hour=0, minute=0, second=0, microsecond=0)
+        current_date_midnight = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        day_diff = current_date_midnight - data_date_midnight        
         day_diff = day_diff.days
-        day_diff = day_diff + 1
 
         if diff > 0:
             text = f"""
