@@ -522,6 +522,7 @@ Total Diff%: *{escape_markdown(str(round((current_price/price - 1) * 100, 2)), 2
     text2 = f"""
 Total : *{escape_markdown(str(total_kar_amount),2)}* TL
 Total Diff%: *{escape_markdown(str(round((after_amount / brfore_amount - 1) * 100,2)), 2)}* %
+Before \> After: *{escape_markdown(str(round((brfore_amount),2)), 2)}* \> *{escape_markdown(str(round((after_amount),2)), 2)}* 
 """
     await context.bot.send_message(chat_id=update.effective_chat.id, text=text2, parse_mode="MarkdownV2")
         
