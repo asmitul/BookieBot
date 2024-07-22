@@ -151,9 +151,9 @@ def delete_transaction(transaction_id: int) -> dict:
         print(f"An error occurred: {e}")
         return {"success": False, "message": "An error occurred while deleting the transaction"}  # Return a default error message or handle the error as needed
     
-
-def get_fon_current_price(fon_code: str):
-    url = f"https://www.tefas.gov.tr/FonAnaliz.aspx?FonKod={fon_code}"
+    
+def get_history_info(bas_tarihi: str, bit_tarihi: str, kod: str):
+    url = f"http://{host}:{port}/{VERSION}/tefas/BindHistoryInfo/{kod}?bastarih={bas_tarihi}&bittarih={bit_tarihi}"
     headers = {
         "accept": "application/json",
     }
@@ -162,17 +162,23 @@ def get_fon_current_price(fon_code: str):
         response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()  # Raises HTTPError if the response status is 4xx, 5xx
         
-        soup = BeautifulSoup(response.text, 'html.parser')
+        return response.json()
+
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
+        return None
+
+def get_rate_of_returns(bas_tarihi: str, bit_tarihi: str):
+    url = f"http://{host}:{port}/{VERSION}/tefas/BindComparisonFundReturns?bastarih={bas_tarihi}&bittarih={bit_tarihi}"
+    headers = {
+        "accept": "application/json",
+    }
+    
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()  # Raises HTTPError if the response status is 4xx, 5xx
         
-        # Use the appropriate CSS selector to find the current price element
-        # Here we use the CSS selector you provided:
-        price_span = soup.select_one("#MainContent_PanelInfo > div.main-indicators > ul.top-list > li:nth-child(1) > span")
-        
-        if price_span:
-            return price_span.text.strip()
-        else:
-            print("Could not find the price element on the page.")
-            return None
+        return response.json()
 
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")

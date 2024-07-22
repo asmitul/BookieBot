@@ -5,7 +5,7 @@ from telegram.constants import ParseMode
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes, ConversationHandler
 from telegram.helpers import escape_markdown
-from API import get_fon_current_price
+from API import get_history_info
 
 # logger
 from logger import setup_logger
@@ -477,16 +477,22 @@ async def callback_fon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         brfore_amount += ( amount * price )
         
         fon_code = name.split()[0]
-        time.sleep(5)
-        current_price = get_fon_current_price(fon_code)
-        # replace , to .
-        try:
-            current_price = current_price.replace(",", ".")
-        except:
-            pass
-        # convert to float or int
-        current_price = convert_to_num(current_price)
+        # get date in format DD.MM.YYYY
+        # Get the current date
+        current_date = datetime.now()
+        # Format the date
+        formatted_current_date = current_date.strftime("%d.%m.%Y")
 
+        # Calculate the date 7 days before
+        seven_days_before = current_date - timedelta(days=7)
+        # Format the date
+        formatted_seven_days_before = seven_days_before.strftime("%d.%m.%Y")
+
+        current_price = get_history_info(formatted_seven_days_before, formatted_current_date, fon_code)
+
+        current_price = current_price['data'][0]['FIYAT']
+        
+        
         after_amount += ( amount * current_price )
 
         diff = round((current_price - price) * amount, 2)
