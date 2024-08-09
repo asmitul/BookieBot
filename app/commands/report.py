@@ -476,7 +476,7 @@ async def callback_fon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         amount = int(amount)
         brfore_amount += ( amount * price )
         
-        fon_code = name.split()[0]
+        fon_code = name[1:4]
         # get date in format DD.MM.YYYY
         # Get the current date
         current_date = datetime.now()
@@ -526,7 +526,7 @@ Total Diff%: *{escape_markdown(str(round((current_price/price - 1) * 100, 2)), 2
         await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode="MarkdownV2", disable_web_page_preview=True)
     
     text2 = f"""
-Total : *{escape_markdown(str(total_kar_amount),2)}* TL
+Total : *{escape_markdown(str(round(total_kar_amount,2)),2)}* TL
 Total Diff%: *{escape_markdown(str(round((after_amount / brfore_amount - 1) * 100,2)), 2)}* %
 Before \> After: *{escape_markdown(str(round((brfore_amount),2)), 2)}* \> *{escape_markdown(str(round((after_amount),2)), 2)}* 
 """
